@@ -1,0 +1,25 @@
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+  server:
+    build:
+      context: ./server
+    container_name: apollo-server
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo
+
+  client:
+    build:
+      context: ./client
+    container_name: client-app
+    ports:
+      - "3000:80"
