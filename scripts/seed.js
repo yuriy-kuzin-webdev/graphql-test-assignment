@@ -1,13 +1,9 @@
 db = db.getSiblingDB('graphql');
 
-const date = new Date();
-
 const categories = Array.from({ length: 20 }).map((_, index) => ({
   name: `Category ${index}`,
   description: `Description for category ${index}`,
   createdBy: 'Seed',
-  createdAt: date,
-  updatedAt: date,
 }));
 
 db.categories.insertMany(categories)
@@ -20,8 +16,6 @@ categories.forEach((category) => {
     categoryId,
     resolved: false,
     createdBy: 'Seed',
-    createdAt: date,
-    updatedAt: date,
   }))
   db.risks.insertMany(risks);
 });
