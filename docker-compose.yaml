@@ -11,6 +11,7 @@ services:
     build:
       context: ./server
     container_name: apollo-server
+    restart: on-failure
     ports:
       - "4000:4000"
     depends_on:
