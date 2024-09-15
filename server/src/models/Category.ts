@@ -12,8 +12,6 @@ const CategorySchema: Schema = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   createdBy: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 export const Category = mongoose.model<ICategory>('Category', CategorySchema);

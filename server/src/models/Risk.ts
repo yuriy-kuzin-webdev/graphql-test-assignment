@@ -16,8 +16,6 @@ const RiskSchema: Schema = new Schema({
   categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
   resolved: { type: Boolean, default: false },
   createdBy: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 export const Risk = mongoose.model<IRisk>('Risk', RiskSchema);
