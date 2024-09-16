@@ -13,8 +13,10 @@ const Dashboard: React.FC = () => {
   const { user, logout } = useAppContext();
   const [view, setView] = useState(Views.Categories);
   const [page, setPage] = useState(1);
-  const [inputPage, setInputPage] = useState('');
   const limit = 10;
+
+  const buttonClass = "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded";
+  const activeButtonClass = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
 
   const { data: categoriesData, loading: categoriesLoading, error: categoriesError } = useQuery(GET_CATEGORIES, {
     variables: { page, limit },
@@ -25,9 +27,6 @@ const Dashboard: React.FC = () => {
     variables: { page, limit },
     skip: view !== Views.Risks,
   });
-
-  const buttonClass = "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded";
-  const activeButtonClass = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
 
   const handleLogout = () => {
     logout();
@@ -44,12 +43,10 @@ const Dashboard: React.FC = () => {
     if (page > 1) setPage((prevPage) => prevPage - 1);
   };
 
-  const handlePageInput = () => {
+  const handlePageInput = (inputPage: number) => {
     const totalPages = view === Views.Categories ? categoriesData?.categories?.totalPages : risksData?.risks?.totalPages;
-    const pageNumber = parseInt(inputPage, 10);
-    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
-      setPage(pageNumber);
-      setInputPage('');
+    if (inputPage >= 1 && inputPage <= totalPages) {
+      setPage(inputPage);
     } else {
       alert(`Please enter a valid page number between 1 and ${totalPages}`);
     }
@@ -57,7 +54,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [view])
+  }, [view]);
 
   return (
     <div className="relative w-full h-screen bg-gray-100 p-8 flex items-start justify-center">
@@ -99,27 +96,13 @@ const Dashboard: React.FC = () => {
                 <Table
                   headings={['name', 'description', 'createdBy']}
                   data={categoriesData.categories.categories}
+                  page={page}
+                  totalPages={categoriesData.categories.totalPages}
+                  onNextPage={handleNextPage}
+                  onPreviousPage={handlePreviousPage}
+                  onPageInput={handlePageInput}
                 />
               )}
-              <div className="flex justify-between mt-4">
-                <button
-                  className={buttonClass}
-                  onClick={handlePreviousPage}
-                  disabled={page === 1}
-                >
-                  Previous
-                </button>
-                <div className="text-gray-700">
-                  Page {page} of {categoriesData?.categories?.totalPages}
-                </div>
-                <button
-                  className={buttonClass}
-                  onClick={handleNextPage}
-                  disabled={page >= categoriesData?.categories?.totalPages}
-                >
-                  Next
-                </button>
-              </div>
             </>
           )}
 
@@ -131,44 +114,15 @@ const Dashboard: React.FC = () => {
                 <Table
                   headings={['name', 'description', 'resolved', 'createdBy']}
                   data={risksData.risks.risks}
+                  page={page}
+                  totalPages={risksData.risks.totalPages}
+                  onNextPage={handleNextPage}
+                  onPreviousPage={handlePreviousPage}
+                  onPageInput={handlePageInput}
                 />
               )}
-              <div className="flex justify-between mt-4">
-                <button
-                  className={buttonClass}
-                  onClick={handlePreviousPage}
-                  disabled={page === 1}
-                >
-                  Previous
-                </button>
-                <div className="text-gray-700">
-                  Page {page} of {risksData?.risks?.totalPages}
-                </div>
-                <button
-                  className={buttonClass}
-                  onClick={handleNextPage}
-                  disabled={page >= risksData?.risks?.totalPages}
-                >
-                  Next
-                </button>
-              </div>
             </>
           )}
-          <div className="mt-4 flex items-center space-x-2">
-            <input
-              type="number"
-              value={inputPage}
-              onChange={(e) => setInputPage(e.target.value)}
-              placeholder="Go to page..."
-              className="px-2 py-1 border border-gray-300 rounded"
-            />
-            <button
-              onClick={handlePageInput}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-            >
-              Go
-            </button>
-          </div>
         </div>
       </div>
     </div>
