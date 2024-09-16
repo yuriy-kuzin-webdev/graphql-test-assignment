@@ -13,6 +13,7 @@ const Dashboard: React.FC = () => {
   const { user, logout } = useAppContext();
   const [view, setView] = useState(Views.Categories);
   const [page, setPage] = useState(1);
+  const [inputPage, setInputPage] = useState('');
   const limit = 10;
 
   const { data: categoriesData, loading: categoriesLoading, error: categoriesError } = useQuery(GET_CATEGORIES, {
@@ -41,6 +42,17 @@ const Dashboard: React.FC = () => {
 
   const handlePreviousPage = () => {
     if (page > 1) setPage((prevPage) => prevPage - 1);
+  };
+
+  const handlePageInput = () => {
+    const totalPages = view === Views.Categories ? categoriesData?.categories?.totalPages : risksData?.risks?.totalPages;
+    const pageNumber = parseInt(inputPage, 10);
+    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
+      setPage(pageNumber);
+      setInputPage('');
+    } else {
+      alert(`Please enter a valid page number between 1 and ${totalPages}`);
+    }
   };
 
   useEffect(() => {
@@ -97,6 +109,9 @@ const Dashboard: React.FC = () => {
                 >
                   Previous
                 </button>
+                <div className="text-gray-700">
+                  Page {page} of {categoriesData?.categories?.totalPages}
+                </div>
                 <button
                   className={buttonClass}
                   onClick={handleNextPage}
@@ -126,6 +141,9 @@ const Dashboard: React.FC = () => {
                 >
                   Previous
                 </button>
+                <div className="text-gray-700">
+                  Page {page} of {risksData?.risks?.totalPages}
+                </div>
                 <button
                   className={buttonClass}
                   onClick={handleNextPage}
@@ -136,6 +154,21 @@ const Dashboard: React.FC = () => {
               </div>
             </>
           )}
+          <div className="mt-4 flex items-center space-x-2">
+            <input
+              type="number"
+              value={inputPage}
+              onChange={(e) => setInputPage(e.target.value)}
+              placeholder="Go to page..."
+              className="px-2 py-1 border border-gray-300 rounded"
+            />
+            <button
+              onClick={handlePageInput}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+            >
+              Go
+            </button>
+          </div>
         </div>
       </div>
     </div>
