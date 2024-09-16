@@ -6,6 +6,7 @@ interface TableProps {
 }
 
 const Table: React.FC<TableProps> = ({ headings, data }) => {
+  console.log(data)
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white">

@@ -13,7 +13,7 @@ const Dashboard: React.FC = () => {
   const { user, logout } = useAppContext();
   const [view, setView] = useState(Views.Categories);
   const [page, setPage] = useState(1);
-  const limit = 5;
+  const limit = 10;
 
   const { data: categoriesData, loading: categoriesLoading, error: categoriesError } = useQuery(GET_CATEGORIES, {
     variables: { page, limit },
@@ -33,22 +33,15 @@ const Dashboard: React.FC = () => {
   };
 
   const handleNextPage = () => {
-    setPage((prevPage) => prevPage + 1);
+    const totalPages = view === Views.Categories ? categoriesData?.categories?.totalPages : risksData?.risks?.totalPages;
+    if (page < totalPages) {
+      setPage((prevPage) => prevPage + 1);
+    }
   };
 
   const handlePreviousPage = () => {
     if (page > 1) setPage((prevPage) => prevPage - 1);
   };
-
-  const categories = [
-    { name: 'Category 1', description: 'Description 1', createdBy: 'User1' },
-    { name: 'Category 2', description: 'Description 2', createdBy: 'User2' },
-  ];
-
-  const risks = [
-    { name: 'Risk 1', description: 'Risk Description 1', resolved: 'Yes', createdBy: 'User1' },
-    { name: 'Risk 2', description: 'Risk Description 2', resolved: 'No', createdBy: 'User2' },
-  ];
 
   return (
     <div className="relative w-full h-screen bg-gray-100 p-8 flex items-start justify-center">
@@ -89,7 +82,7 @@ const Dashboard: React.FC = () => {
               {categoriesData && (
                 <Table
                   headings={['name', 'description', 'createdBy']}
-                  data={categoriesData.categories}
+                  data={categoriesData.categories.categories}
                 />
               )}
               <div className="flex justify-between mt-4">
@@ -103,6 +96,7 @@ const Dashboard: React.FC = () => {
                 <button
                   className={buttonClass}
                   onClick={handleNextPage}
+                  disabled={page >= categoriesData?.categories?.totalPages}
                 >
                   Next
                 </button>
@@ -117,7 +111,7 @@ const Dashboard: React.FC = () => {
               {risksData && (
                 <Table
                   headings={['name', 'description', 'resolved', 'createdBy']}
-                  data={risksData.risks}
+                  data={risksData.risks.risks}
                 />
               )}
               <div className="flex justify-between mt-4">
@@ -131,6 +125,7 @@ const Dashboard: React.FC = () => {
                 <button
                   className={buttonClass}
                   onClick={handleNextPage}
+                  disabled={page >= risksData?.risks?.totalPages}
                 >
                   Next
                 </button>
