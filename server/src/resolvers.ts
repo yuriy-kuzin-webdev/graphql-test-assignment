@@ -27,18 +27,36 @@ export const resolvers = {
     Query: {
         categories: async (_: unknown, { filter = {}, page = 1, limit = 10 }: PaginationArgs) => {
             const skip = (page - 1) * limit;
-            return await Category.find(filter)
-                .skip(skip)
-                .limit(limit);
+            const [totalItems, categories] = await Promise.all([
+                Category.countDocuments(filter),
+                Category.find(filter).skip(skip).limit(limit)
+            ]);
+
+            const totalPages = Math.ceil(totalItems / limit);
+
+            return {
+                categories,
+                totalPages,
+                totalItems
+            };
         },
         category: async (_: unknown, { id }: any) => {
             return await Category.findById(id);
         },
         risks: async (_: unknown, { filter = {}, page = 1, limit = 10 }: PaginationArgs) => {
             const skip = (page - 1) * limit;
-            return await Risk.find(filter)
-                .skip(skip)
-                .limit(limit);
+            const [totalItems, risks] = await Promise.all([
+                Risk.countDocuments(filter),
+                Risk.find(filter).skip(skip).limit(limit)
+            ]);
+
+            const totalPages = Math.ceil(totalItems / limit);
+
+            return {
+                risks,
+                totalPages,
+                totalItems
+            };
         },
         risk: async (_: unknown, { id }: any) => {
             return await Risk.findById(id);

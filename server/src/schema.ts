@@ -19,10 +19,22 @@ export const typeDefs = gql`
     createdBy: String
   }
 
+  type PaginatedCategoryResult {
+    categories: [Category!]!
+    totalPages: Int!
+    totalItems: Int!
+  }
+
+  type PaginatedRiskResult {
+    risks: [Risk!]!
+    totalPages: Int!
+    totalItems: Int!
+  }
+
   type Query {
-    categories(filter: CategoryFilter, page: Int, limit: Int): [Category!]!
+    categories(filter: CategoryFilter, page: Int, limit: Int): PaginatedCategoryResult!
     category(id: ID!): Category
-    risks(filter: RiskFilter, page: Int, limit: Int): [Risk!]!
+    risks(filter: RiskFilter, page: Int, limit: Int): PaginatedRiskResult!
     risk(id: ID!): Risk
   }
 
