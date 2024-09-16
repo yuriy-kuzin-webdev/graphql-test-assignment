@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_CATEGORIES, GET_RISKS } from '../graphql/queries';
 import { useAppContext } from '../context/Context';
@@ -42,6 +42,10 @@ const Dashboard: React.FC = () => {
   const handlePreviousPage = () => {
     if (page > 1) setPage((prevPage) => prevPage - 1);
   };
+
+  useEffect(() => {
+    setPage(1);
+  }, [view])
 
   return (
     <div className="relative w-full h-screen bg-gray-100 p-8 flex items-start justify-center">
