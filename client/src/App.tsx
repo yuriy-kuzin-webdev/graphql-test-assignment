@@ -1,26 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { ContextProvider, useAppContext } from './context/Context';
+import Login from './Pages/Login';
 
-function App() {
+const App: React.FC = () => {
+  const { user } = useAppContext();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="h-screen flex items-center justify-center bg-gray-200">
+      {user ? (
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-6">Welcome, {user.username}!</h1>
+        </div>
+      ) : (
+        <Login/>
+      )}
     </div>
   );
-}
+};
 
-export default App;
+const RootApp: React.FC = () => (
+  <ContextProvider>
+    <App />
+  </ContextProvider>
+);
+
+export default RootApp;
