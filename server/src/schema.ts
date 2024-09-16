@@ -7,6 +7,7 @@ export const typeDefs = gql`
     description: String
     createdBy: String
     risks: [Risk!]!
+    deleted: Boolean!
   }
 
   type Risk {
@@ -42,6 +43,7 @@ export const typeDefs = gql`
     createCategory(name: String!, description: String, createdBy: String): Category!
     updateCategory(id: ID!, name: String, description: String): Category
     deleteCategory(id: ID!): Boolean!
+    restoreCategory(id: ID!): Category
 
     createRisk(name: String!, description: String, categoryId: ID!, resolved: Boolean!, createdBy: String): Risk!
     updateRisk(id: ID!, name: String, description: String, resolved: Boolean): Risk
@@ -52,6 +54,7 @@ export const typeDefs = gql`
     name: String
     description: String
     createdBy: String
+    deleted: Boolean
   }
 
   input RiskFilter {

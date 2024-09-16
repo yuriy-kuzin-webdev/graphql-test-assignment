@@ -5,6 +5,7 @@ interface CategoryFilter {
     name?: string,
     description?: string,
     createdBy?: string,
+    deleted?: boolean,
 }
 
 interface RiskFilter {
@@ -27,9 +28,13 @@ export const resolvers = {
     Query: {
         categories: async (_: unknown, { filter = {}, page = 1, limit = 10 }: PaginationArgs) => {
             const skip = (page - 1) * limit;
+            const query = {
+                ...filter,
+                deleted: false,
+            }
             const [totalItems, categories] = await Promise.all([
-                Category.countDocuments(filter),
-                Category.find(filter).skip(skip).limit(limit)
+                Category.countDocuments(query),
+                Category.find(query).skip(skip).limit(limit)
             ]);
 
             const totalPages = Math.ceil(totalItems / limit);
@@ -65,15 +70,19 @@ export const resolvers = {
 
     Mutation: {
         createCategory: async (_: unknown, { name, description, createdBy }: ICategory) => {
-            const category = new Category({ name, description, createdBy });
+            const category = new Category({ name, description, createdBy, deleted: false });
             return await category.save();
         },
         updateCategory: async (_: unknown, { id, name, description }: ICategory) => {
             return await Category.findByIdAndUpdate(id, { name, description }, { new: true });
         },
         deleteCategory: async (_: unknown, { id }: ICategory) => {
-            const result = await Category.findByIdAndDelete(id);
+            const result = await Category.findByIdAndUpdate(id, { deleted: true }, { new: true });
             return !!result;
+        },
+        restoreCategory: async (_: unknown, { id }: ICategory) => {
+            const result = await Category.findByIdAndUpdate(id, { deleted: false }, { new: true });
+            return result;
         },
 
         createRisk: async (_: unknown, { name, description, categoryId, resolved, createdBy }: IRisk) => {
