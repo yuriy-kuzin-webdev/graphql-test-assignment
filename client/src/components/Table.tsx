@@ -9,9 +9,15 @@ interface TableProps {
   onPreviousPage: () => void;
   onPageInput: (inputPage: number) => void;
   onDelete: (id: string) => void;
+  onStatusChange: (id: string, resolved: boolean) => void;
 }
 
-const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextPage, onPreviousPage, onPageInput, onDelete }) => {
+enum Status {
+  Resolved = 'Resolved',
+  Unresolved = 'Unresolved'
+}
+
+const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextPage, onPreviousPage, onPageInput, onDelete, onStatusChange }) => {
   const [inputPage, setInputPage] = useState('');
 
   const handlePageChange = () => {
@@ -55,7 +61,18 @@ const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextP
               <tr key={rowIndex} className="border-t">
                 {headings.map((heading, colIndex) => (
                   <td key={colIndex} className="py-2 px-4">
-                    {item[heading]}
+                    {heading === 'status' ? (
+                      <span
+                        onClick={() => onStatusChange(item._id, item['resolved'])}
+                        className={`cursor-pointer underline ${
+                          item['resolved'] ? 'text-green-500' : 'text-red-500'
+                        }`}
+                      >
+                        {item['resolved'] ? Status.Resolved : Status.Unresolved }
+                      </span>
+                    ) : (
+                      item[heading]
+                    )}
                   </td>
                 ))}
                 <td>

@@ -11,3 +11,12 @@ export const DELETE_RISK = gql`
     deleteRisk(id: $id)
   }
 `;
+
+export const UPDATE_RISK = gql`
+  mutation UpdateRisk($id: ID!, $resolved: Boolean!) {
+    updateRisk(id: $id, resolved: $resolved) {
+      _id
+      resolved
+    }
+  }
+`;

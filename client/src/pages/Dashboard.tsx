@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CATEGORIES, GET_RISKS } from '../graphql/queries';
-import { DELETE_CATEGORY, DELETE_RISK } from '../graphql/mutations';
+import { DELETE_CATEGORY, DELETE_RISK, UPDATE_RISK } from '../graphql/mutations';
 import { useAppContext } from '../context/Context';
 import Table from '../components/Table';
 
@@ -50,6 +50,10 @@ const Dashboard: React.FC = () => {
     onCompleted: () => refetchRisks(),
   });
 
+  const [updateRisk] = useMutation(UPDATE_RISK, {
+    onCompleted: () => refetchRisks(),
+  });
+
   const handleLogout = () => {
     logout();
   };
@@ -81,6 +85,13 @@ const Dashboard: React.FC = () => {
   const handleDeleteCategory = (id: string) => deleteCategory({ variables: { id } });
 
   const handleDeleteRisk = (id: string) => deleteRisk({ variables: { id } });
+
+  const handleStatusChange = (id: string, currentStatus: boolean) => {
+    const newStatus = !currentStatus;
+    updateRisk({
+      variables: { id, resolved: newStatus },
+    });
+  };
 
   useEffect(() => {
     setPage(1);
@@ -132,6 +143,7 @@ const Dashboard: React.FC = () => {
                   onPreviousPage={handlePreviousPage}
                   onPageInput={handlePageInput}
                   onDelete={handleDeleteCategory}
+                  onStatusChange={() => {}}
                 />
               )}
             </>
@@ -143,7 +155,7 @@ const Dashboard: React.FC = () => {
               {risksError && <p>Error loading risks</p>}
               {risksData && (
                 <Table
-                  headings={['name', 'description', 'resolved', 'createdBy']}
+                  headings={['name', 'description', 'status', 'createdBy']}
                   data={risksData.risks.risks}
                   page={page}
                   totalPages={risksData.risks.totalPages}
@@ -151,6 +163,7 @@ const Dashboard: React.FC = () => {
                   onPreviousPage={handlePreviousPage}
                   onPageInput={handlePageInput}
                   onDelete={handleDeleteRisk}
+                  onStatusChange={handleStatusChange}
                 />
               )}
             </>
