@@ -15,8 +15,8 @@ export const GET_CATEGORIES = gql`
 `;
 
 export const GET_RISKS = gql`
-  query GetRisks($page: Int, $limit: Int) {
-    risks(page: $page, limit: $limit) {
+  query GetRisks($page: Int, $limit: Int, $filter: RiskFilter) {
+    risks(page: $page, limit: $limit, filter: $filter) {
       risks {
         _id
         name

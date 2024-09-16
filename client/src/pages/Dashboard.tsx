@@ -14,6 +14,7 @@ const Dashboard: React.FC = () => {
   const { user, logout } = useAppContext();
   const [view, setView] = useState(Views.Categories);
   const [page, setPage] = useState(1);
+  const [onlyUnresolved, setOnlyUnresolved] = useState(false);
   const limit = 10;
 
   const buttonClass = "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded";
@@ -38,7 +39,11 @@ const Dashboard: React.FC = () => {
     error: risksError,
     refetch: refetchRisks
   } = useQuery(GET_RISKS, {
-    variables: { page, limit },
+    variables: { 
+      page,
+      limit,
+      filter: onlyUnresolved ? { resolved: false } : {}
+    },
     skip: view !== Views.Risks,
   });
 
@@ -91,6 +96,11 @@ const Dashboard: React.FC = () => {
     updateRisk({
       variables: { id, resolved: newStatus },
     });
+  };
+
+  const toggleResolvedFilter = () => {
+    setOnlyUnresolved(!onlyUnresolved);
+    refetchRisks();
   };
 
   useEffect(() => {
@@ -151,6 +161,17 @@ const Dashboard: React.FC = () => {
 
           {view === Views.Risks && (
             <>
+              <div className="flex items-center mb-4">
+                <label htmlFor="unresolved-toggle" className="mr-2">
+                  Show Only Unresolved Risks
+                </label>
+                <input
+                  id="unresolved-toggle"
+                  type="checkbox"
+                  checked={onlyUnresolved}
+                  onChange={toggleResolvedFilter}
+                />
+              </div>
               {risksLoading && <p>Loading Risks...</p>}
               {risksError && <p>Error loading risks</p>}
               {risksData && (
