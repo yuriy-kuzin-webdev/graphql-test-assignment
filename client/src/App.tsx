@@ -1,7 +1,8 @@
 import React from 'react';
 import { ContextProvider, useAppContext } from './context/Context';
-import Login from './Pages/Login';
-import Dashboard from './Pages/Dashboard';
+import ApolloProvider from './provider/ApolloProvider';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 
 const App: React.FC = () => {
   const { user } = useAppContext();
@@ -14,9 +15,11 @@ const App: React.FC = () => {
 };
 
 const RootApp: React.FC = () => (
-  <ContextProvider>
-    <App />
-  </ContextProvider>
+  <ApolloProvider>
+    <ContextProvider>
+      <App />
+    </ContextProvider>
+  </ApolloProvider>
 );
 
 export default RootApp;
