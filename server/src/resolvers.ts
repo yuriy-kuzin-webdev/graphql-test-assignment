@@ -2,41 +2,43 @@ import { Category, ICategory } from './models/Category';
 import { IRisk, Risk } from './models/Risk';
 
 interface CategoryFilter {
-    name: string,
-    description: string,
-    createdBy: string,
+    name?: string,
+    description?: string,
+    createdBy?: string,
 }
 
 interface RiskFilter {
-    name: string
-    description: string
-    createdBy: string
-    resolved: boolean
-    categoryId: any
+    name?: string
+    description?: string
+    createdBy?: string
+    resolved?: boolean
+    categoryId?: any
 }
 
 type Filter = CategoryFilter | RiskFilter;
 
 type PaginationArgs = {
-    filter: Filter
-    page: number,
-    limit: number,
+    filter?: Filter
+    page?: number,
+    limit?: number,
 }
 
 export const resolvers = {
     Query: {
-        categories: async (_: unknown, { filter, page = 1, limit = 10 }: PaginationArgs) => {
+        categories: async (_: unknown, { filter = {}, page = 1, limit = 10 }: PaginationArgs) => {
             const skip = (page - 1) * limit;
-            const query = filter ? { ...filter } : {};
-            return await Category.find(query).skip(skip).limit(limit);
+            return await Category.find(filter)
+                .skip(skip)
+                .limit(limit);
         },
         category: async (_: unknown, { id }: any) => {
             return await Category.findById(id);
         },
-        risks: async (_: unknown, { filter, page = 1, limit = 10 }: PaginationArgs) => {
+        risks: async (_: unknown, { filter = {}, page = 1, limit = 10 }: PaginationArgs) => {
             const skip = (page - 1) * limit;
-            const query = filter ? { ...filter } : {};
-            return await Risk.find(query).skip(skip).limit(limit);
+            return await Risk.find(filter)
+                .skip(skip)
+                .limit(limit);
         },
         risk: async (_: unknown, { id }: any) => {
             return await Risk.findById(id);
@@ -66,6 +68,18 @@ export const resolvers = {
         deleteRisk: async (_: unknown, { id }: IRisk) => {
             const result = await Risk.findByIdAndDelete(id);
             return !!result;
+        },
+    },
+
+    Category: {
+        risks: async (category: ICategory) => {
+            return await Risk.find({ categoryId: category._id })
+        },
+    },
+
+    Risk: {
+        category: async (risk: IRisk) => {
+            return await Category.findById(risk.categoryId);
         },
     },
 };
