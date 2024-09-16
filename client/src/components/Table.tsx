@@ -8,9 +8,10 @@ interface TableProps {
   onNextPage: () => void;
   onPreviousPage: () => void;
   onPageInput: (inputPage: number) => void;
+  onDelete: (id: string) => void;
 }
 
-const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextPage, onPreviousPage, onPageInput }) => {
+const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextPage, onPreviousPage, onPageInput, onDelete }) => {
   const [inputPage, setInputPage] = useState('');
 
   const handlePageChange = () => {
@@ -18,6 +19,12 @@ const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextP
     if (!isNaN(pageNumber)) {
       onPageInput(pageNumber);
       setInputPage('');
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Are you sure ?')) {
+      onDelete(id);
     }
   };
 
@@ -31,6 +38,9 @@ const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextP
                 {heading}
               </th>
             ))}
+            <th className="py-2 px-4 bg-gray-200 text-left capitalize">
+              Action
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -48,6 +58,14 @@ const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextP
                     {item[heading]}
                   </td>
                 ))}
+                <td>
+                  <button
+                    onClick={() => handleDelete(item._id)}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))
           )}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { GET_CATEGORIES, GET_RISKS } from '../graphql/queries';
+import { DELETE_CATEGORY, DELETE_RISK } from '../graphql/mutations';
 import { useAppContext } from '../context/Context';
 import Table from '../components/Table';
 
@@ -18,14 +19,35 @@ const Dashboard: React.FC = () => {
   const buttonClass = "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded";
   const activeButtonClass = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
 
-  const { data: categoriesData, loading: categoriesLoading, error: categoriesError } = useQuery(GET_CATEGORIES, {
-    variables: { page, limit },
+  const { 
+    data: categoriesData,
+    loading: categoriesLoading,
+    error: categoriesError,
+    refetch: refetchCategories
+  } = useQuery(GET_CATEGORIES, {
+    variables: {
+      page,
+      limit
+    },
     skip: view !== Views.Categories,
   });
 
-  const { data: risksData, loading: risksLoading, error: risksError } = useQuery(GET_RISKS, {
+  const { 
+    data: risksData,
+    loading: risksLoading,
+    error: risksError,
+    refetch: refetchRisks
+  } = useQuery(GET_RISKS, {
     variables: { page, limit },
     skip: view !== Views.Risks,
+  });
+
+  const [deleteCategory] = useMutation(DELETE_CATEGORY, {
+    onCompleted: () => refetchCategories(),
+  });
+
+  const [deleteRisk] = useMutation(DELETE_RISK, {
+    onCompleted: () => refetchRisks(),
   });
 
   const handleLogout = () => {
@@ -33,7 +55,9 @@ const Dashboard: React.FC = () => {
   };
 
   const handleNextPage = () => {
-    const totalPages = view === Views.Categories ? categoriesData?.categories?.totalPages : risksData?.risks?.totalPages;
+    const totalPages = view === Views.Categories 
+      ? categoriesData?.categories?.totalPages 
+      : risksData?.risks?.totalPages;
     if (page < totalPages) {
       setPage((prevPage) => prevPage + 1);
     }
@@ -44,13 +68,19 @@ const Dashboard: React.FC = () => {
   };
 
   const handlePageInput = (inputPage: number) => {
-    const totalPages = view === Views.Categories ? categoriesData?.categories?.totalPages : risksData?.risks?.totalPages;
+    const totalPages = view === Views.Categories 
+      ? categoriesData?.categories?.totalPages
+      : risksData?.risks?.totalPages;
     if (inputPage >= 1 && inputPage <= totalPages) {
       setPage(inputPage);
     } else {
       alert(`Please enter a valid page number between 1 and ${totalPages}`);
     }
   };
+
+  const handleDeleteCategory = (id: string) => deleteCategory({ variables: { id } });
+
+  const handleDeleteRisk = (id: string) => deleteRisk({ variables: { id } });
 
   useEffect(() => {
     setPage(1);
@@ -101,6 +131,7 @@ const Dashboard: React.FC = () => {
                   onNextPage={handleNextPage}
                   onPreviousPage={handlePreviousPage}
                   onPageInput={handlePageInput}
+                  onDelete={handleDeleteCategory}
                 />
               )}
             </>
@@ -119,6 +150,7 @@ const Dashboard: React.FC = () => {
                   onNextPage={handleNextPage}
                   onPreviousPage={handlePreviousPage}
                   onPageInput={handlePageInput}
+                  onDelete={handleDeleteRisk}
                 />
               )}
             </>
