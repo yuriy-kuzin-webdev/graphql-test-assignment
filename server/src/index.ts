@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { ApolloServer } from 'apollo-server';
 import { typeDefs } from './schema';
 import { resolvers } from './resolvers';
+import { categoryLoader } from './dataloader';
 
 const connectWithRetry = () => {
     mongoose.connect('mongodb://mongo:27017/graphql')
@@ -18,7 +19,10 @@ connectWithRetry();
 
 const server = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    context: () => ({
+        categoryLoader
+    })
 })
 
 server.listen().then(({ url }) => {

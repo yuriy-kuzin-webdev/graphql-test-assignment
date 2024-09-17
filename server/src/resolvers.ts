@@ -105,8 +105,8 @@ export const resolvers = {
     },
 
     Risk: {
-        category: async (risk: IRisk) => {
-            return await Category.findById(risk.categoryId);
+        category: async (risk: IRisk, _: unknown, { categoryLoader }: any) => {
+            return await categoryLoader.load(risk.categoryId);
         },
     },
 };
