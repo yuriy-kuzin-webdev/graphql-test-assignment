@@ -4,6 +4,7 @@ import { GET_CATEGORIES, GET_RISKS } from '../graphql/queries';
 import { 
   DELETE_CATEGORY,
   DELETE_RISK,
+  UPDATE_CATEGORY,
   UPDATE_RISK,
   CREATE_CATEGORY,
   CREATE_RISK
@@ -61,6 +62,10 @@ const Dashboard: React.FC = () => {
     onCompleted: () => refetchRisks(),
   });
 
+  const [updateCategory] = useMutation(UPDATE_CATEGORY, {
+    onCompleted: () => refetchCategories(),
+  });
+
   const [updateRisk] = useMutation(UPDATE_RISK, {
     onCompleted: () => refetchRisks(),
   });
@@ -111,6 +116,18 @@ const Dashboard: React.FC = () => {
       variables: { id, resolved: newStatus },
     });
   };
+
+  const handleUpdateCategory = (id: string, key: string, value: string) => {
+    updateCategory({
+      variables: { id, [key]: value},
+    });
+  }
+
+  const handleUpdateRisk = (id: string, key: string, value: string) => {
+    updateRisk({
+      variables: { id, [key]: value},
+    })
+  }
 
   const toggleResolvedFilter = () => {
     setOnlyUnresolved(!onlyUnresolved);
@@ -181,6 +198,7 @@ const Dashboard: React.FC = () => {
                   onDelete={handleDeleteCategory}
                   onStatusChange={() => {}}
                   onCreate={handleCreateCategory}
+                  onUpdate={handleUpdateCategory}
                 />
               )}
             </>
@@ -213,6 +231,7 @@ const Dashboard: React.FC = () => {
                   onDelete={handleDeleteRisk}
                   onStatusChange={handleStatusChange}
                   onCreate={handleCreateRisk}
+                  onUpdate={handleUpdateRisk}
                 />
               )}
             </>

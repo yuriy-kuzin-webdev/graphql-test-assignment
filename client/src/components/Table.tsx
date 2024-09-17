@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/Context';
 import CategoriesDropdown from './CategoriesDropdown';
+import EditableCell from './EditableCell';
 
 interface TableProps {
   headings: string[];
@@ -13,6 +14,7 @@ interface TableProps {
   onDelete: (id: string) => void;
   onStatusChange: (id: string, resolved: boolean) => void;
   onCreate: (newData: any) => void;
+  onUpdate: (id: string, key: string, value: string) => void;
 }
 
 enum Status {
@@ -31,6 +33,7 @@ const Table: React.FC<TableProps> = ({
   onDelete,
   onStatusChange,
   onCreate,
+  onUpdate,
 }) => {
   const { user } = useAppContext();
   const [inputPage, setInputPage] = useState('');
@@ -139,7 +142,16 @@ const Table: React.FC<TableProps> = ({
           ) : (
             data.map((item, rowIndex) => (
               <tr key={rowIndex} className="border-t">
-                {headings.map((heading, colIndex) => (
+                {headings.map((heading, colIndex) => 
+                  heading === 'name' || heading === 'description' ? (
+                    <EditableCell
+                      key={colIndex}
+                      item={item}
+                      value={item[heading]}
+                      field={heading}
+                      onChange={onUpdate}
+                    />
+                  ) : (
                   <td key={colIndex} className="py-2 px-4">
                     {heading === 'status' ? (
                       <span
@@ -152,7 +164,7 @@ const Table: React.FC<TableProps> = ({
                     ) : heading === 'category' ? (
                       item[heading].name
                     ) : (
-                      item[heading]
+                        item[heading]
                     )}
                   </td>
                 ))}
