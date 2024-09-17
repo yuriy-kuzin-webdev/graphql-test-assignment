@@ -28,9 +28,17 @@ export const resolvers = {
     Query: {
         categories: async (_: unknown, { filter = {}, page = 1, limit = 10 }: PaginationArgs) => {
             const skip = (page - 1) * limit;
-            const query = {
-                ...filter,
+            const query: any = {
                 deleted: false,
+            }
+            if (filter.name || filter.description) {
+                query.$and = [];
+            }
+            if (filter.name) {
+                query.$and.push({ name: { $regex: filter.name, $options: 'i' } })
+            }
+            if (filter.description) {
+                query.$and.push({ description: { $regex: filter.description, $options: 'i' } })
             }
             const [totalItems, categories] = await Promise.all([
                 Category.countDocuments(query),
@@ -50,9 +58,21 @@ export const resolvers = {
         },
         risks: async (_: unknown, { filter = {}, page = 1, limit = 10 }: PaginationArgs) => {
             const skip = (page - 1) * limit;
+            const query: any = { ...filter };
+            if (filter.name || filter.description) {
+                query.$and = [];
+            }
+            if (filter.name) {
+                query.$and.push({ name: { $regex: filter.name, $options: 'i' } })
+                delete query['name'];
+            }
+            if (filter.description) {
+                query.$and.push({ description: { $regex: filter.description, $options: 'i' } })
+                delete query['description'];
+            }
             const [totalItems, risks] = await Promise.all([
-                Risk.countDocuments(filter),
-                Risk.find(filter).skip(skip).limit(limit)
+                Risk.countDocuments(query),
+                Risk.find(query).skip(skip).limit(limit)
             ]);
 
             const totalPages = Math.ceil(totalItems / limit);

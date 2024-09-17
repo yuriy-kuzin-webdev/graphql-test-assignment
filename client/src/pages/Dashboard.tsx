@@ -22,6 +22,8 @@ const Dashboard: React.FC = () => {
   const [view, setView] = useState(Views.Categories);
   const [page, setPage] = useState(1);
   const [onlyUnresolved, setOnlyUnresolved] = useState(false);
+  const [searchByNameQuery, setSearchByNameQuery] = useState('');
+  const [searchByDescriptionQuery, setSearchByDescriptionQuery] = useState('');
   const limit = 10;
 
   const buttonClass = "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded";
@@ -35,7 +37,12 @@ const Dashboard: React.FC = () => {
   } = useQuery(GET_CATEGORIES, {
     variables: {
       page,
-      limit
+      limit,
+      filter: searchByNameQuery || searchByDescriptionQuery 
+        ? {
+          ...(searchByNameQuery && { name: searchByNameQuery }),
+          ...(searchByDescriptionQuery && { description: searchByDescriptionQuery })
+        } : {}
     },
     skip: view !== Views.Categories,
   });
@@ -49,7 +56,12 @@ const Dashboard: React.FC = () => {
     variables: { 
       page,
       limit,
-      filter: onlyUnresolved ? { resolved: false } : {}
+      filter: onlyUnresolved || searchByNameQuery || searchByDescriptionQuery 
+      ? {
+        ...(searchByNameQuery && { name: searchByNameQuery }),
+        ...(searchByDescriptionQuery && { description: searchByDescriptionQuery }),
+        ...(onlyUnresolved && { resolved: false }),
+      } : {}
     },
     skip: view !== Views.Risks,
   });
@@ -146,6 +158,14 @@ const Dashboard: React.FC = () => {
     });
   };
 
+  const handleSearchByNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchByNameQuery(event.target.value);
+  };
+
+  const handleSearchByDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchByDescriptionQuery(event.target.value);
+  };
+
   useEffect(() => {
     setPage(1);
   }, [view]);
@@ -179,6 +199,26 @@ const Dashboard: React.FC = () => {
           >
             Risks
           </button>
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={searchByNameQuery}
+            onChange={handleSearchByNameChange}
+            className="border border-gray-300 rounded p-2 w-full"
+          />
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by description..."
+            value={searchByDescriptionQuery}
+            onChange={handleSearchByDescriptionChange}
+            className="border border-gray-300 rounded p-2 w-full"
+          />
         </div>
 
         <div className="mt-4">

@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_CATEGORIES = gql`
-  query GetCategories($page: Int, $limit: Int) {
-    categories(page: $page, limit: $limit) {
+  query GetCategories($page: Int, $limit: Int, $filter: CategoryFilter) {
+    categories(page: $page, limit: $limit, filter: $filter) {
       categories {
         _id
         name
