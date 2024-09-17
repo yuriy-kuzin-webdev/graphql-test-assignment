@@ -35,6 +35,9 @@ export const GET_RISKS = gql`
         description
         resolved
         createdBy
+        category {
+          name
+        }
       }
       totalPages
     }

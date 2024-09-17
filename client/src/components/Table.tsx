@@ -149,6 +149,8 @@ const Table: React.FC<TableProps> = ({
                       >
                         {item['resolved'] ? Status.Resolved : Status.Unresolved}
                       </span>
+                    ) : heading === 'category' ? (
+                      item[heading].name
                     ) : (
                       item[heading]
                     )}
