@@ -31,3 +31,14 @@ export const CREATE_CATEGORY = gql`
     }
   }
 `;
+
+export const CREATE_RISK = gql`
+  mutation CreateRisk($name: String!, $description: String!, $createdBy: String!, $categoryId: ID!, $resolved: Boolean!) {
+    createRisk(name: $name, description: $description, createdBy: $createdBy, categoryId: $categoryId, resolved: $resolved) {
+      _id
+      name
+      description
+      createdBy
+    }
+  }
+`;

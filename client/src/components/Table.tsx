@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/Context';
+import CategoriesDropdown from './CategoriesDropdown';
 
 interface TableProps {
   headings: string[];
@@ -61,6 +62,10 @@ const Table: React.FC<TableProps> = ({
       alert('please provide description');
       return;
     }
+    if (headings.includes('category') && !newItem['categoryId']) {
+      alert('please select category');
+      return;
+    }
     onCreate(newItem);
     setNewItem({
       createdBy: user?.username,
@@ -103,6 +108,8 @@ const Table: React.FC<TableProps> = ({
                       placeholder={`Enter ${heading}`}
                       className={`px-2 py-1 border border-gray-300 rounded w-full ${heading === 'createdBy' ? 'invisible' : ''}`}
                     />
+                  ) : heading === 'category' ? (
+                    <CategoriesDropdown onChange={(e) => handleInputChange('categoryId', e)}/>
                   ) : (
                     <select
                       value={newItem['resolved'] ? Status.Resolved : Status.Unresolved}

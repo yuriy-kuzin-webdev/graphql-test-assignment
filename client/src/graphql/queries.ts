@@ -14,6 +14,18 @@ export const GET_CATEGORIES = gql`
   }
 `;
 
+export const GET_CATEGORIES_IDS = gql`
+  query GetCategories($page: Int, $limit: Int) {
+    categories(page: $page, limit: $limit) {
+      categories {
+        _id
+        name
+      }
+      totalPages
+    }
+  }
+`;
+
 export const GET_RISKS = gql`
   query GetRisks($page: Int, $limit: Int, $filter: RiskFilter) {
     risks(page: $page, limit: $limit, filter: $filter) {

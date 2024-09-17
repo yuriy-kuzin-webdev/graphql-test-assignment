@@ -5,7 +5,8 @@ import {
   DELETE_CATEGORY,
   DELETE_RISK,
   UPDATE_RISK,
-  CREATE_CATEGORY
+  CREATE_CATEGORY,
+  CREATE_RISK
 } from '../graphql/mutations';
 import { useAppContext } from '../context/Context';
 import Table from '../components/Table';
@@ -68,6 +69,10 @@ const Dashboard: React.FC = () => {
     onCompleted: () => refetchCategories(),
   });
 
+  const [createRisk] = useMutation(CREATE_RISK, {
+    onCompleted: () => refetchRisks(),
+  });
+
   const handleLogout = () => {
     logout();
   };
@@ -113,14 +118,15 @@ const Dashboard: React.FC = () => {
   };
 
   const handleCreateCategory = (newCategoryData: any) => {
-    console.log(newCategoryData)
     createCategory({
       variables: newCategoryData,
     });
   };
   
   const handleCreateRisk = (newRiskData: any) => {
-    console.log(newRiskData)
+    createRisk({
+      variables: newRiskData,
+    });
   };
 
   useEffect(() => {
@@ -197,7 +203,7 @@ const Dashboard: React.FC = () => {
               {risksError && <p>Error loading risks</p>}
               {risksData && (
                 <Table
-                  headings={['name', 'description', 'status', 'createdBy']}
+                  headings={['name', 'description', 'category', 'status', 'createdBy']}
                   data={risksData.risks.risks}
                   page={page}
                   totalPages={risksData.risks.totalPages}
