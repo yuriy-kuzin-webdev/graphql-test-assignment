@@ -20,3 +20,14 @@ export const UPDATE_RISK = gql`
     }
   }
 `;
+
+export const CREATE_CATEGORY = gql`
+  mutation CreateCategory($name: String!, $description: String!, $createdBy: String!) {
+    createCategory(name: $name, description: $description, createdBy: $createdBy) {
+      _id
+      name
+      description
+      createdBy
+    }
+  }
+`;

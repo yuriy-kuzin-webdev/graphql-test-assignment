@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CATEGORIES, GET_RISKS } from '../graphql/queries';
-import { DELETE_CATEGORY, DELETE_RISK, UPDATE_RISK } from '../graphql/mutations';
+import { 
+  DELETE_CATEGORY,
+  DELETE_RISK,
+  UPDATE_RISK,
+  CREATE_CATEGORY
+} from '../graphql/mutations';
 import { useAppContext } from '../context/Context';
 import Table from '../components/Table';
 
@@ -59,6 +64,10 @@ const Dashboard: React.FC = () => {
     onCompleted: () => refetchRisks(),
   });
 
+  const [createCategory] = useMutation(CREATE_CATEGORY, {
+    onCompleted: () => refetchCategories(),
+  });
+
   const handleLogout = () => {
     logout();
   };
@@ -101,6 +110,17 @@ const Dashboard: React.FC = () => {
   const toggleResolvedFilter = () => {
     setOnlyUnresolved(!onlyUnresolved);
     refetchRisks();
+  };
+
+  const handleCreateCategory = (newCategoryData: any) => {
+    console.log(newCategoryData)
+    createCategory({
+      variables: newCategoryData,
+    });
+  };
+  
+  const handleCreateRisk = (newRiskData: any) => {
+    console.log(newRiskData)
   };
 
   useEffect(() => {
@@ -154,6 +174,7 @@ const Dashboard: React.FC = () => {
                   onPageInput={handlePageInput}
                   onDelete={handleDeleteCategory}
                   onStatusChange={() => {}}
+                  onCreate={handleCreateCategory}
                 />
               )}
             </>
@@ -185,6 +206,7 @@ const Dashboard: React.FC = () => {
                   onPageInput={handlePageInput}
                   onDelete={handleDeleteRisk}
                   onStatusChange={handleStatusChange}
+                  onCreate={handleCreateRisk}
                 />
               )}
             </>

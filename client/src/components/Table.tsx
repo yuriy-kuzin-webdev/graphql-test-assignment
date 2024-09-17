@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAppContext } from '../context/Context';
 
 interface TableProps {
   headings: string[];
@@ -10,6 +11,7 @@ interface TableProps {
   onPageInput: (inputPage: number) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, resolved: boolean) => void;
+  onCreate: (newData: any) => void;
 }
 
 enum Status {
@@ -17,8 +19,24 @@ enum Status {
   Unresolved = 'Unresolved'
 }
 
-const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextPage, onPreviousPage, onPageInput, onDelete, onStatusChange }) => {
+const Table: React.FC<TableProps> = ({
+  headings,
+  data,
+  page,
+  totalPages,
+  onNextPage,
+  onPreviousPage,
+  onPageInput,
+  onDelete,
+  onStatusChange,
+  onCreate,
+}) => {
+  const { user } = useAppContext();
   const [inputPage, setInputPage] = useState('');
+  const [newItem, setNewItem] = useState<any>({
+    createdBy: user?.username,
+    ...(headings.includes('status') && { resolved: false })
+  });
 
   const handlePageChange = () => {
     const pageNumber = parseInt(inputPage, 10);
@@ -32,6 +50,29 @@ const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextP
     if (window.confirm('Are you sure ?')) {
       onDelete(id);
     }
+  };
+
+  const handleCreate = () => {
+    if (!newItem['name']) {
+      alert('Please provide name');
+      return;
+    }
+    if (!newItem['description']) {
+      alert('please provide description');
+      return;
+    }
+    onCreate(newItem);
+    setNewItem({
+      createdBy: user?.username,
+      ...(headings.includes('status') && { resolved: false })
+    });
+  };
+
+  const handleInputChange = (key: string, value: string | boolean) => {
+    setNewItem({
+      ...newItem,
+      [key]: value,
+    });
   };
 
   return (
@@ -50,6 +91,38 @@ const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextP
           </tr>
         </thead>
         <tbody>
+          <tr>
+            {headings.map((heading, colIndex) => (
+              <td key={colIndex} className="py-2 px-4">
+                {heading === 'name' || heading === 'description' || heading === 'createdBy'
+                  ? (
+                    <input
+                      type="text"
+                      value={newItem[heading] || ''}
+                      onChange={(e) => handleInputChange(heading, e.target.value)}
+                      placeholder={`Enter ${heading}`}
+                      className={`px-2 py-1 border border-gray-300 rounded w-full ${heading === 'createdBy' ? 'invisible' : ''}`}
+                    />
+                  ) : (
+                    <select
+                      value={newItem['resolved'] ? Status.Resolved : Status.Unresolved}
+                      onChange={(e) => handleInputChange('resolved', e.target.value === Status.Resolved)}
+                    >
+                      <option value={Status.Unresolved}>{Status.Unresolved}</option>
+                      <option value={Status.Resolved}>{Status.Resolved}</option>
+                    </select>
+                  )}
+              </td>
+            ))}
+            <td>
+              <button
+                onClick={handleCreate}
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded"
+              >
+                Create
+              </button>
+            </td>
+          </tr>
           {data.length === 0 ? (
             <tr>
               <td colSpan={headings.length} className="text-center py-4">
@@ -64,11 +137,10 @@ const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextP
                     {heading === 'status' ? (
                       <span
                         onClick={() => onStatusChange(item._id, item['resolved'])}
-                        className={`cursor-pointer underline ${
-                          item['resolved'] ? 'text-green-500' : 'text-red-500'
-                        }`}
+                        className={`cursor-pointer underline ${item['resolved'] ? 'text-green-500' : 'text-red-500'
+                          }`}
                       >
-                        {item['resolved'] ? Status.Resolved : Status.Unresolved }
+                        {item['resolved'] ? Status.Resolved : Status.Unresolved}
                       </span>
                     ) : (
                       item[heading]
@@ -102,20 +174,20 @@ const Table: React.FC<TableProps> = ({ headings, data, page, totalPages, onNextP
         </div>
 
         <div className="flex items-center space-x-2">
-        <input
-          type="number"
-          value={inputPage}
-          onChange={(e) => setInputPage(e.target.value)}
-          placeholder="Go to page..."
-          className="px-2 py-1 border border-gray-300 rounded"
-        />
-        <button
-          onClick={handlePageChange}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-        >
-          Go
-        </button>
-      </div>
+          <input
+            type="number"
+            value={inputPage}
+            onChange={(e) => setInputPage(e.target.value)}
+            placeholder="Go to page..."
+            className="px-2 py-1 border border-gray-300 rounded"
+          />
+          <button
+            onClick={handlePageChange}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+          >
+            Go
+          </button>
+        </div>
 
         <button
           className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
